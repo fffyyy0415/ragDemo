@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件上传</title>
+</head>
+<body>
+    <h1>上传文件</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" id="fileInput" name="fileInput" multiple style="display:none;">
+        <button type="button" onclick="document.getElementById('fileInput').click()">上传</button>
+    </form>
+    <div>
+        <input type="text" id="dataInput" placeholder="输入数据">
+        <button type="button" onclick="sendData()">发送数据</button>
+    </div>
+    <div id="status"></div>
+
+    <script>
+        function uploadFile() {
+            const form = document.getElementById('uploadForm');
+            const formData = new FormData(form);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('status').innerText = '上传成功: ' + data.message;
+            })
+            .catch(error => {
+                document.getElementById('status').innerText = '上传失败: ' + error;
+            });
+        }
+
+        document.getElementById('fileInput').addEventListener('change', uploadFile);
+
+        function sendData() {
+            const data = document.getElementById('dataInput').value;
+            fetch('/sendData', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({ data: data })
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('status').innerText = '数据发送成功: ' + data;
+            })
+            .catch(error => {
+                document.getElementById('status').innerText = '数据发送失败: ' + error;
+            });
+        }
+    </script>
+</body>
+</html>
